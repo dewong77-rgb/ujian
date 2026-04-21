@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem Ujian Online — Sekolah</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink     : #060C1A;
+  --paper   : #F5F7FF;
+  --blue    : #1A56DB;
+  --blue-l  : #3B82F6;
+  --cyan    : #06B6D4;
+  --green   : #10B981;
+  --gold    : #F59E0B;
+  --surface : rgba(255,255,255,.06);
+  --border  : rgba(255,255,255,.10);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--ink);
+  color: #E2E8F0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── GRID BG ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image:
+    linear-gradient(rgba(59,130,246,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* ── GLOW ORBS ── */
+.orb {
+  position: fixed; border-radius: 50%;
+  filter: blur(100px); pointer-events: none; z-index: 0;
+}
+.orb-1 { width: 500px; height: 500px; background: rgba(26,86,219,.18); top: -150px; left: -100px; }
+.orb-2 { width: 400px; height: 400px; background: rgba(6,182,212,.12); bottom: -100px; right: -80px; }
+.orb-3 { width: 300px; height: 300px; background: rgba(16,185,129,.08); top: 40%; left: 50%; transform: translateX(-50%); }
+
+/* ── LAYOUT ── */
+.wrap { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(16px);
+  background: rgba(6,12,26,.75);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+.nav-inner {
+  max-width: 1000px; margin: 0 auto;
+  height: 60px; display: flex; align-items: center; justify-content: space-between;
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 15px; font-weight: 700;
+  text-decoration: none; color: #fff;
+}
+.nav-brand .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+  animation: blink 2s ease infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.nav-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; color: rgba(255,255,255,.4);
+}
+
+/* ── HERO ── */
+.hero {
+  padding: 100px 0 80px;
+  text-align: center;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(59,130,246,.12);
+  border: 1px solid rgba(59,130,246,.25);
+  border-radius: 20px; padding: 6px 16px;
+  font-size: 12px; font-weight: 600; color: #93C5FD;
+  margin-bottom: 28px;
+  animation: fadeUp .6s ease both;
+}
+.hero-badge::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: #3B82F6; box-shadow: 0 0 6px #3B82F6;
+}
+
+.hero h1 {
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 800; line-height: 1.1;
+  letter-spacing: -2px;
+  margin-bottom: 20px;
+  animation: fadeUp .6s .1s ease both;
+}
+.hero h1 .line1 { display: block; color: #fff; }
+.hero h1 .line2 {
+  display: block;
+  background: linear-gradient(90deg, var(--blue-l), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  font-size: 16px; color: rgba(255,255,255,.5); max-width: 480px;
+  margin: 0 auto 48px; line-height: 1.7;
+  animation: fadeUp .6s .2s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── CARDS ── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 80px;
+  animation: fadeUp .6s .3s ease both;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 28px;
+  text-decoration: none;
+  color: inherit;
+  display: flex; flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+  cursor: pointer;
+}
+.card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.03), transparent);
+  pointer-events: none;
+}
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--card-color, rgba(255,255,255,.2));
+  box-shadow: 0 20px 40px rgba(0,0,0,.3), 0 0 0 1px var(--card-color, transparent);
+}
+
+.card.siswa   { --card-color: rgba(16,185,129,.4); }
+.card.guru    { --card-color: rgba(59,130,246,.4); }
+.card.admin   { --card-color: rgba(245,158,11,.4); }
+
+.card-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  position: relative;
+}
+.card.siswa .card-icon { background: rgba(16,185,129,.15); box-shadow: 0 0 20px rgba(16,185,129,.2); }
+.card.guru  .card-icon { background: rgba(59,130,246,.15); box-shadow: 0 0 20px rgba(59,130,246,.2); }
+.card.admin .card-icon { background: rgba(245,158,11,.15); box-shadow: 0 0 20px rgba(245,158,11,.2); }
+
+.card-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.card.siswa .card-label { color: #34D399; }
+.card.guru  .card-label { color: #93C5FD; }
+.card.admin .card-label { color: #FCD34D; }
+
+.card h3 { font-size: 20px; font-weight: 700; color: #fff; line-height: 1.2; }
+.card p  { font-size: 13px; color: rgba(255,255,255,.45); line-height: 1.6; flex: 1; }
+
+.card-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-size: 13px; font-weight: 700;
+  margin-top: 4px;
+  transition: opacity .2s;
+}
+.card.siswa .card-btn { background: rgba(16,185,129,.15); color: #34D399; }
+.card.guru  .card-btn { background: rgba(59,130,246,.15); color: #93C5FD; }
+.card.admin .card-btn { background: rgba(245,158,11,.15); color: #FCD34D; }
+.card:hover .card-btn { opacity: .8; }
+.card-btn .arrow { font-size: 16px; transition: transform .2s; }
+.card:hover .card-btn .arrow { transform: translateX(4px); }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 28px 24px;
+  text-align: center;
+  font-size: 12px; color: rgba(255,255,255,.25);
+}
+footer strong { color: rgba(255,255,255,.5); }
+
+/* ── MODAL TOKEN ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.7); backdrop-filter: blur(8px);
+  z-index: 999; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: #0F1729; border: 1px solid var(--border);
+  border-radius: 20px; padding: 36px; max-width: 420px; width: 100%;
+  text-align: center; box-shadow: 0 40px 80px rgba(0,0,0,.5);
+  animation: fadeUp .25s ease;
+}
+.modal-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.modal-box p  { font-size: 13px; color: rgba(255,255,255,.45); margin-bottom: 24px; }
+.token-input-wrap { position: relative; margin-bottom: 16px; }
+.token-input-wrap input {
+  width: 100%; padding: 14px 16px;
+  background: rgba(255,255,255,.06); border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: 22px; font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: #fff; text-align: center; letter-spacing: 4px;
+  outline: none; text-transform: uppercase;
+  transition: border .2s;
+}
+.token-input-wrap input:focus { border-color: var(--cyan); }
+.nisn-input {
+  width: 100%; padding: 11px 14px; margin-bottom: 12px;
+  background: rgba(255,255,255,.06); border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: 15px; font-family: 'Sora', sans-serif;
+  color: #fff; outline: none; transition: border .2s;
+}
+.nisn-input:focus { border-color: var(--green); }
+.nisn-input::placeholder { color: rgba(255,255,255,.25); }
+.btn-masuk {
+  width: 100%; padding: 13px; border: none; border-radius: 10px;
+  background: linear-gradient(135deg, var(--green), #059669);
+  color: #fff; font-size: 15px; font-weight: 700;
+  cursor: pointer; font-family: 'Sora', sans-serif;
+  transition: opacity .2s; margin-bottom: 10px;
+  box-shadow: 0 0 20px rgba(16,185,129,.3);
+}
+.btn-masuk:hover { opacity: .85; }
+.btn-tutup {
+  background: none; border: none; color: rgba(255,255,255,.35);
+  font-size: 13px; cursor: pointer; font-family: 'Sora', sans-serif;
+  transition: color .2s;
+}
+.btn-tutup:hover { color: rgba(255,255,255,.7); }
+.modal-err {
+  background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.2);
+  color: #FCA5A5; padding: 10px 14px; border-radius: 8px;
+  font-size: 12px; margin-bottom: 12px; display: none;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .cards { grid-template-columns: 1fr; }
+  .feat-grid { grid-template-columns: 1fr; }
+  .hero { padding: 60px 0 48px; }
+  .status-bar { flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- MODAL SISWA -->
+<div class="modal-overlay" id="modal-siswa">
+  <div class="modal-box">
+    <div style="font-size:40px;margin-bottom:12px">📝</div>
+    <h3>Masuk ke Ruang Ujian</h3>
+    <p>Masukkan NISN dan token sesi<br>yang diberikan pengawas ruangan</p>
+    <div class="modal-err" id="modal-err"></div>
+    <input class="nisn-input" type="text" id="input-nisn" placeholder="NISN (10 digit)" maxlength="10" inputmode="numeric">
+    <div class="token-input-wrap">
+      <input type="text" id="input-token" placeholder="XXXX-XXXX" maxlength="9">
+    </div>
+    <button class="btn-masuk" onclick="masukUjian()">Masuk ke Ujian →</button>
+    <br>
+    <button class="btn-tutup" onclick="closeModal()">✕ Tutup</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">
+      <div class="dot"></div>
+      Sistem Ujian Online
+    </a>
+    <div class="nav-time" id="nav-time">—</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-badge">Sistem Ujian Berbasis Web</div>
+    <h1>
+      <span class="line1">Ujian Online</span>
+      <span class="line2">Digital Sekolah</span>
+    </h1>
+    
+  </section>
+
+  <!-- CARDS -->
+  <div class="cards">
+
+    <!-- SISWA -->
+    <div class="card siswa" onclick="bukaModalSiswa()">
+      <div class="card-icon">📝</div>
+      <div>
+        <div class="card-label">Peserta Ujian</div>
+        <h3>Ruang Ujian Siswa</h3>
+      </div>
+      <p>Kerjakan soal ujian dengan tampilan nyaman, timer, dan navigasi soal seperti ANBK.</p>
+      <div class="card-btn">
+        Masuk ke Ujian
+        <span class="arrow">→</span>
+      </div>
+    </div>
+
+    <!-- GURU -->
+    <a class="card guru" href="panel-guru.html">
+      <div class="card-icon">📚</div>
+      <div>
+        <div class="card-label">Pengajar</div>
+        <h3>Panel Guru</h3>
+      </div>
+      <p>Upload soal, preview tampilan ujian, dan download hasil nilai & rekap kehadiran siswa.</p>
+      <div class="card-btn">
+        Masuk Panel Guru
+        <span class="arrow">→</span>
+      </div>
+    </a>
+
+    <!-- ADMIN -->
+    <a class="card admin" href="panel-admin.html">
+      <div class="card-icon">🛡️</div>
+      <div>
+        <div class="card-label">Administrator</div>
+        <h3>Panel Admin</h3>
+      </div>
+      <p>Kelola data siswa, guru, mapel, buat sesi ujian, generate token, dan monitor kesiapan soal.</p>
+      <div class="card-btn">
+        Masuk Panel Admin
+        <span class="arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>© 2026</footer>
+
+<script>
+// ── LIVE CLOCK ──
+setInterval(() => {
+  document.getElementById('nav-time').textContent =
+    new Date().toLocaleTimeString('id-ID', {
+      weekday:'short', day:'numeric', month:'short',
+      hour:'2-digit', minute:'2-digit'
+    });
+}, 1000);
+
+// ── MODAL SISWA ──
+function bukaModalSiswa() {
+  document.getElementById('modal-siswa').classList.add('open');
+  setTimeout(() => document.getElementById('input-nisn').focus(), 100);
+}
+function closeModal() {
+  document.getElementById('modal-siswa').classList.remove('open');
+  document.getElementById('modal-err').style.display = 'none';
+}
+
+// Format token otomatis XXXX-XXXX
+document.getElementById('input-token').addEventListener('input', function() {
+  let val = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (val.length > 4) val = val.slice(0,4) + '-' + val.slice(4,8);
+  this.value = val;
+});
+
+function masukUjian() {
+  const nisn  = document.getElementById('input-nisn').value.trim();
+  const token = document.getElementById('input-token').value.trim();
+  const err   = document.getElementById('modal-err');
+  err.style.display = 'none';
+
+  if (!nisn || nisn.length < 8) {
+    err.textContent = 'NISN minimal 8 digit'; err.style.display = 'block'; return;
+  }
+  if (!token || token.length < 9) {
+    err.textContent = 'Token harus 8 karakter (format XXXX-XXXX)'; err.style.display = 'block'; return;
+  }
+
+  // Simpan ke sessionStorage lalu buka ujian.html
+  sessionStorage.setItem('login_nisn', nisn);
+  sessionStorage.setItem('login_token', token);
+  window.location.href = 'ujian.html?nisn=' + encodeURIComponent(nisn) + '&token=' + encodeURIComponent(token);
+}
+
+// Enter key
+document.getElementById('input-token').addEventListener('keydown', e => {
+  if (e.key === 'Enter') masukUjian();
+});
+
+// Tutup modal klik luar
+document.getElementById('modal-siswa').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>
